@@ -1,9 +1,13 @@
-/* WORDSPACE offline service worker — network first, cache fallback
+/* WORDSPACE offline service worker
  * 托管部署的访问凭据通过 SW 脚本 URL 的 query 传入（register('./sw.js' + location.search)）。
  * 平台对不带凭据的同源请求一律 403，因此这里为静态资源与导航请求自动补齐凭据。
- * 本地 / 无凭据环境下 CRED 为空，行为退化为普通网络优先缓存。
+ * 本地 / 无凭据环境下 CRED 为空，行为退化为普通缓存策略。
+ *
+ * 缓存策略：
+ *  - 带哈希的静态资源（/assets/*.js|css、图标、字体）→ 缓存优先 + 后台刷新，重复访问秒开首屏
+ *  - 导航与词库 JSON → 网络优先、失败回退缓存，保证拿到最新页面
  */
-const CACHE = 'wordspace-shell-v3'
+const CACHE = 'wordspace-shell-v4'
 const CRED = self.location.search || ''
 
 function withCred(raw) {
@@ -61,6 +65,27 @@ self.addEventListener('fetch', (event) => {
   }
 
   const finalReq = target.url === req.url ? req : new Request(target.url, req)
+  // 带哈希的构建产物与图标/字体：缓存优先，重复访问秒开；后台静默刷新缓存
+  const isHashedAsset = /\/(?:assets\/|icons?\/)/.test(url.pathname)
+    || /\.(?:js|css|woff2?|png|ico|svg)$/.test(url.pathname)
+
+  if (isHashedAsset) {
+    event.respondWith(
+      caches.match(finalReq).then((cached) => {
+        const network = fetch(finalReq).then((res) => {
+          if (res && res.status === 200 && res.type === 'basic') {
+            const copy = res.clone()
+            caches.open(CACHE).then((c) => c.put(finalReq, copy)).catch(() => {})
+          }
+          return res
+        }).catch(() => cached)
+        return cached || network
+      })
+    )
+    return
+  }
+
+  // 其余（导航、manifest、词库 JSON 等）：网络优先，失败回退缓存
   event.respondWith(
     fetch(finalReq)
       .then((res) => {
