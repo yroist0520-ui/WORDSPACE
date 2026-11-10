@@ -2,12 +2,38 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>TYPE LAB — AI 字体创作与自由排版</title>
-    <meta name="description" content="TYPE LAB：上传字体参考图，分析字体风格，生成新字形，并逐字自由排版。" />
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23111'/%3E%3Ctext x='16' y='23' font-size='19' font-family='monospace' fill='%23fff' text-anchor='middle'%3ET%3C/text%3E%3C/svg%3E" />
-    <script type="module" crossorigin src="/type-lab/assets/index-BVYMO5_G.js"></script>
-    <link rel="stylesheet" crossorigin href="/type-lab/assets/index-pPmIn_lp.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>WORDSPACE · 个人单词卡片空间</title>
+    <meta name="description" content="WORDSPACE — 用 Apple Pencil 亲手制作单词卡片，连续制卡，间隔复习。" />
+    <meta name="theme-color" content="#F8F6F2" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="WORDSPACE" />
+    <meta name="format-detection" content="telephone=no" />
+    <!-- 托管部署下静态资源同样需要分享凭据；由脚本把当前页面凭据附加到各 link，
+         否则浏览器自动请求 manifest / 图标会得到 403，导致主屏幕图标与 PWA 安装失效。 -->
+    <script>
+      (function () {
+        var q = window.location.search || ''
+        var assets = [
+          ['manifest', 'manifest.webmanifest'],
+          ['apple-touch-icon', 'apple-touch-icon.png'],
+          ['icon', 'icon-192.png', 'image/png'],
+          ['shortcut icon', 'favicon.ico', 'image/x-icon']
+        ]
+        for (var i = 0; i < assets.length; i++) {
+          var a = assets[i]
+          var l = document.createElement('link')
+          l.rel = a[0]
+          if (a[2]) l.type = a[2]
+          l.href = a[1] + q
+          document.head.appendChild(l)
+        }
+      })()
+    </script>
+    <script type="module" crossorigin src="./assets/index-DZhdLSQO.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-B3rVRws_.css">
   </head>
   <body>
     <div id="root"></div>
