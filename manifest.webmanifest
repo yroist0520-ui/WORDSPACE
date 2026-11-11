@@ -1,7 +1,7 @@
 {
   "name": "WORDSPACE · 个人单词卡片空间",
   "short_name": "WORDSPACE",
-  "description": "用 Apple Pencil 亲手制作单词卡片，连续制卡，间隔复习。",
+  "description": "整理你的英语单词卡片，配合发音与间隔复习，轻松记住每个词。",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
