@@ -7,7 +7,7 @@
  *  - 带哈希的静态资源（/assets/*.js|css、图标、字体）→ 缓存优先 + 后台刷新，重复访问秒开首屏
  *  - 导航与词库 JSON → 网络优先、失败回退缓存，保证拿到最新页面
  */
-const CACHE = 'wordspace-shell-v4'
+const CACHE = 'wordspace-shell-v5'
 const CRED = self.location.search || ''
 
 function withCred(raw) {
