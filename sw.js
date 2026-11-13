@@ -7,7 +7,9 @@
  *  - 带哈希的静态资源（/assets/*.js|css、图标、字体）→ 缓存优先 + 后台刷新，重复访问秒开首屏
  *  - 导航与词库 JSON → 网络优先、失败回退缓存，保证拿到最新页面
  */
-const CACHE = 'wordspace-shell-v5'
+// 每次内置词库 / 首屏结构有变化时递增，强制淘汰旧 index.html 缓存，
+// 避免弱网回退命中旧脚本（旧逻辑不含专四/专八等新增词库）。
+const CACHE = 'wordspace-shell-v6'
 const CRED = self.location.search || ''
 
 function withCred(raw) {
@@ -65,6 +67,17 @@ self.addEventListener('fetch', (event) => {
   }
 
   const finalReq = target.url === req.url ? req : new Request(target.url, req)
+
+  // 词库 JSON：完全交给页面代码控制（并行加载 + 单包超时 + 失败提示与重试）。
+  // 绝不缓存：弱网下 CDN 可能返回一个 HTTP 200 但 body 被截断的响应，
+  // 一旦被当作成功缓存，之后会一直命中损坏副本，导致专四/专八等词库永远加载不出来。
+  // 词库补种结果本就落在 IndexedDB，离线时无需依赖 SW 缓存词库文件。
+  const isVocabJson = /\/vocab\/.*\.json$/.test(url.pathname)
+  if (isVocabJson) {
+    event.respondWith(fetch(finalReq))
+    return
+  }
+
   // 带哈希的构建产物与图标/字体：缓存优先，重复访问秒开；后台静默刷新缓存
   const isHashedAsset = /\/(?:assets\/|icons?\/)/.test(url.pathname)
     || /\.(?:js|css|woff2?|png|ico|svg)$/.test(url.pathname)
