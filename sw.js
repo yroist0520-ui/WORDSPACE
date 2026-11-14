@@ -9,7 +9,7 @@
  */
 // 每次内置词库 / 首屏结构有变化时递增，强制淘汰旧 index.html 缓存，
 // 避免弱网回退命中旧脚本（旧逻辑不含专四/专八等新增词库）。
-const CACHE = 'wordspace-shell-v8'
+const CACHE = 'wordspace-shell-v9'
 const CRED = self.location.search || ''
 
 function withCred(raw) {
