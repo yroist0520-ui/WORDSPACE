@@ -1,0 +1,130 @@
+{
+  "version": 5,
+  "packs": [
+    {
+      "name": "cet.json",
+      "chunks": [
+        "chunks/cet/cet4-000.json",
+        "chunks/cet/cet4-001.json",
+        "chunks/cet/cet4-002.json",
+        "chunks/cet/cet4-003.json",
+        "chunks/cet/cet6-000.json",
+        "chunks/cet/cet6-001.json",
+        "chunks/cet/cet6-002.json",
+        "chunks/cet/cet6-003.json",
+        "chunks/cet/ky-000.json",
+        "chunks/cet/ky-001.json",
+        "chunks/cet/ky-002.json",
+        "chunks/cet/ky-003.json",
+        "chunks/cet/ky-004.json",
+        "chunks/cet/gaokao-000.json",
+        "chunks/cet/gaokao-001.json",
+        "chunks/cet/gaokao-002.json",
+        "chunks/cet/gaokao-003.json",
+        "chunks/cet/zhongzhi-000.json",
+        "chunks/cet/zhongzhi-001.json",
+        "chunks/cet/zhongzhi-002.json"
+      ]
+    },
+    {
+      "name": "ielts.json",
+      "chunks": [
+        "chunks/ielts/ielts-000.json",
+        "chunks/ielts/ielts-001.json"
+      ]
+    },
+    {
+      "name": "tem.json",
+      "chunks": [
+        "chunks/tem/tem4-000.json",
+        "chunks/tem/tem4-001.json",
+        "chunks/tem/tem4-002.json",
+        "chunks/tem/tem8-000.json",
+        "chunks/tem/tem8-001.json",
+        "chunks/tem/tem8-002.json",
+        "chunks/tem/tem8-003.json",
+        "chunks/tem/tem8-004.json",
+        "chunks/tem/tem8-005.json",
+        "chunks/tem/tem8-006.json",
+        "chunks/tem/tem8-007.json"
+      ]
+    }
+  ],
+  "decks": [
+    {
+      "key": "cet4",
+      "name": "CET-4 高频词",
+      "description": "大学英语四级完整词表 · 含音标、释义、词组与例句（正序）",
+      "color": "#587C9B",
+      "symbol": "A",
+      "pack": "cet.json",
+      "expected": 4544
+    },
+    {
+      "key": "cet6",
+      "name": "CET-6 高频词",
+      "description": "大学英语六级完整词表 · 含音标、释义、词组与例句（正序）",
+      "color": "#6E9B7B",
+      "symbol": "B",
+      "pack": "cet.json",
+      "expected": 3991
+    },
+    {
+      "key": "ky",
+      "name": "考研英语",
+      "description": "考研英语完整词表 · 含音标、释义、词组与例句（正序）",
+      "color": "#D19A63",
+      "symbol": "C",
+      "pack": "cet.json",
+      "expected": 5047
+    },
+    {
+      "key": "gaokao",
+      "name": "高考英语",
+      "description": "高中英语 / 高考完整词表 · 含音标、释义、词组与例句（正序）",
+      "color": "#8B7BB8",
+      "symbol": "F",
+      "pack": "cet.json",
+      "expected": 3743
+    },
+    {
+      "key": "zhongzhi",
+      "name": "中职高考英语",
+      "description": "上海市教育考试院 2022 三校生（中职）高考英语科考纲词汇表 2,714 词 · 音标、词组与例句由开源词库补充",
+      "color": "#C0806B",
+      "symbol": "G",
+      "pack": "cet.json",
+      "expected": 2714
+    },
+    {
+      "key": "ielts",
+      "name": "雅思词汇",
+      "description": "IELTS Academic & Topic Vocabulary",
+      "color": "#3E7C75",
+      "symbol": "I",
+      "nameEn": "IELTS VOCABULARY",
+      "pack": "ielts.json",
+      "expected": 299
+    },
+    {
+      "key": "tem4",
+      "name": "TEM-4 专四词汇",
+      "description": "英语专业四级核心词表 · 含音标、词性释义、词组与例句",
+      "color": "#7C8FB5",
+      "symbol": "T",
+      "nameEn": "TEM-4 VOCABULARY",
+      "pack": "tem.json",
+      "expected": 4340
+    },
+    {
+      "key": "tem8",
+      "name": "TEM-8 专八词汇",
+      "description": "英语专业八级进阶词表 · 含音标、词性释义、词组与例句",
+      "color": "#A8798F",
+      "symbol": "E",
+      "nameEn": "TEM-8 VOCABULARY",
+      "pack": "tem.json",
+      "expected": 12410
+    }
+  ]
+}

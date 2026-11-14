@@ -9,7 +9,7 @@
  */
 // 每次内置词库 / 首屏结构有变化时递增，强制淘汰旧 index.html 缓存，
 // 避免弱网回退命中旧脚本（旧逻辑不含专四/专八等新增词库）。
-const CACHE = 'wordspace-shell-v6'
+const CACHE = 'wordspace-shell-v7'
 const CRED = self.location.search || ''
 
 function withCred(raw) {
@@ -68,12 +68,46 @@ self.addEventListener('fetch', (event) => {
 
   const finalReq = target.url === req.url ? req : new Request(target.url, req)
 
-  // 词库 JSON：完全交给页面代码控制（并行加载 + 单包超时 + 失败提示与重试）。
-  // 绝不缓存：弱网下 CDN 可能返回一个 HTTP 200 但 body 被截断的响应，
-  // 一旦被当作成功缓存，之后会一直命中损坏副本，导致专四/专八等词库永远加载不出来。
-  // 词库补种结果本就落在 IndexedDB，离线时无需依赖 SW 缓存词库文件。
-  const isVocabJson = /\/vocab\/.*\.json$/.test(url.pathname)
-  if (isVocabJson) {
+  // 词库分片 / 清单：v5 起大包拆成 33 个小分片，单片 gzip 后约 80~120KB。
+  // 缓存优先 + 后台校验刷新：二次启动秒开，且只有「能被 JSON.parse 且结构正确」
+  // 的响应才会写入缓存，杜绝弱网下 200 但 body 截断的坏副本被永久命中。
+  const isVocabChunk = /\/vocab\/chunks\/.*\.json$/.test(url.pathname)
+  const isVocabManifest = /\/vocab\/manifest\.json$/.test(url.pathname)
+  const isLegacyVocabJson = /\/vocab\/[^/]+\.json$/.test(url.pathname)
+  if (isVocabChunk || isVocabManifest) {
+    const valid = (text, isManifest) => {
+      try {
+        const o = JSON.parse(text)
+        return isManifest
+          ? !!(o && Array.isArray(o.packs) && o.packs.length)
+          : !!(o && o.pack && Array.isArray(o.decks))
+      } catch { return false }
+    }
+    const jsonResponse = (text) => new Response(text, {
+      status: 200, headers: { 'Content-Type': 'application/json; charset=utf-8' },
+    })
+    event.respondWith(
+      caches.match(finalReq).then((cached) => {
+        const network = fetch(finalReq)
+          .then(async (res) => {
+            if (!res || res.status !== 200 || res.type !== 'basic') return res || cached
+            const text = await res.text()
+            if (valid(text, isVocabManifest)) {
+              caches.open(CACHE)
+                .then((c) => c.put(finalReq, jsonResponse(text)))
+                .catch(() => {})
+            }
+            return jsonResponse(text)
+          })
+          .catch(() => cached)
+        // 清单走网络优先，保证拿到最新分片表；分片走缓存优先，弱网下秒开
+        return isVocabManifest ? network : (cached || network)
+      })
+    )
+    return
+  }
+  // 旧版整包（兜底路径）：完全交给页面代码，不缓存
+  if (isLegacyVocabJson) {
     event.respondWith(fetch(finalReq))
     return
   }
