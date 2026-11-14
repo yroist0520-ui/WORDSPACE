@@ -9,7 +9,7 @@
  */
 // 每次内置词库 / 首屏结构有变化时递增，强制淘汰旧 index.html 缓存，
 // 避免弱网回退命中旧脚本（旧逻辑不含专四/专八等新增词库）。
-const CACHE = 'wordspace-shell-v7'
+const CACHE = 'wordspace-shell-v8'
 const CRED = self.location.search || ''
 
 function withCred(raw) {
@@ -83,25 +83,33 @@ self.addEventListener('fetch', (event) => {
           : !!(o && o.pack && Array.isArray(o.decks))
       } catch { return false }
     }
-    const jsonResponse = (text) => new Response(text, {
-      status: 200, headers: { 'Content-Type': 'application/json; charset=utf-8' },
-    })
     event.respondWith(
-      caches.match(finalReq).then((cached) => {
-        const network = fetch(finalReq)
-          .then(async (res) => {
-            if (!res || res.status !== 200 || res.type !== 'basic') return res || cached
-            const text = await res.text()
-            if (valid(text, isVocabManifest)) {
-              caches.open(CACHE)
-                .then((c) => c.put(finalReq, jsonResponse(text)))
-                .catch(() => {})
-            }
-            return jsonResponse(text)
-          })
-          .catch(() => cached)
-        // 清单走网络优先，保证拿到最新分片表；分片走缓存优先，弱网下秒开
-        return isVocabManifest ? network : (cached || network)
+      caches.match(finalReq).then(async (cached) => {
+        // 分片命中缓存立即返回，绝不额外发一次网络请求：慢网下重复请求
+        // 会与页面下载抢带宽，是线上「全部分片被 abort」的诱因之一。
+        if (cached && isVocabChunk) return cached
+        try {
+          const res = await fetch(finalReq)
+          if (res && res.status === 200 && res.type === 'basic') {
+            const copy = res.clone()
+            // 校验与写缓存全部放到后台，不阻塞本次响应；
+            // 只有结构完整的 JSON 才进缓存，杜绝截断副本被永久命中。
+            void (async () => {
+              try {
+                const text = await copy.text()
+                if (valid(text, isVocabManifest)) {
+                  const c = await caches.open(CACHE)
+                  await c.put(finalReq, new Response(text, {
+                    status: 200, headers: { 'Content-Type': 'application/json; charset=utf-8' },
+                  }))
+                }
+              } catch { /* 损坏响应不缓存 */ }
+            })()
+          }
+          return res || cached || Response.error()
+        } catch {
+          return cached || Response.error()
+        }
       })
     )
     return
